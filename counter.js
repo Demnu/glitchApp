@@ -90,7 +90,7 @@ var counter = 0;
 const output = async()=>{
     console.log("logging into db");
     await connectDB(process.env.MONGO_URI);
-    console.log()
+    console.log("logged in")
     //get all products
     productNames = [];
     try{
@@ -215,9 +215,9 @@ function findOrders(){
         console.log("empty inbox")
     }
 
-    // for(var i = 0 ; i<orders.length ; i++){
-    //     createOrder(orders[i]);
-    // }
+    for(var i = 0 ; i<orders.length ; i++){
+        createOrder(orders[i]);
+    }
 
 
 }
