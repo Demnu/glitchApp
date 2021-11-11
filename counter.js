@@ -105,7 +105,9 @@ const output = async()=>{
 
 
     // lr = new LineByLineReader('C:/Users/harry/AppData/Roaming/Thunderbird/Profiles/1ogmaobo.default-release/ImapMail/imap.gmail.com/INBOX','utf8');
-    lr = new LineByLineReader('./INBOXtest','utf8');
+    // lr = new LineByLineReader('./INBOXtest','utf8');
+    lr = new LineByLineReader('/orders.txt','utf8');
+
     
     lr.on('error', function (err) {
         // 'err' contains error object
@@ -126,8 +128,9 @@ function findOrders(){
     for (var i = 0 ; i<data.length;i++){
         var foundOrder =false;
         var str = data[i];
-        if (str.includes('Date:'))// 00 - Date: Mon, 08 Nov 2021 03:07:42 +0000
+        if (str.includes('Order date '))// Phone: 0478 126 069 ABN: 41618895953          Order #G5505   Order date 08
         {
+            console.log(str);
             var str2 = String(data[i+16]);// 16 - Phone: 0478 126 069 ABN: 41618895953          Order #G5515   Order date 08
             if(str2.includes('Phone:')&& str2.includes('Order')){
                 //if order is 16 lines after

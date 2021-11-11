@@ -5,10 +5,6 @@ require('dotenv').config();
 const counter = require("./counter")
 const port = 3000;
 
-
-
-
-
 const start = async () => {
   try {
     app.listen(port, () =>
