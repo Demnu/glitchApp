@@ -7,10 +7,17 @@ const OrderSchema = new mongoose.Schema({
     trim: true,
     //maxlength: [20, 'name can not be more than 20 characters'],
     unique: true,
-  },
-  date:{},
-  products:{}
 
+  },
+  date:{
+    type:Date
+  },
+  products:{
+    type:Array,
+    "product" : {
+      
+  },
+  }
 })
 
 module.exports = mongoose.model('Order', OrderSchema)

@@ -3,7 +3,8 @@ const fs = require('fs')
 const LineByLineReader = require('line-by-line')
 const connectDB = require('./db/connect');
 const Order = require('./models/Order')
-const Product = require('./models/Product')
+const Product = require('./models/Product');
+const { toNamespacedPath } = require('path');
 var productNames = [];
 var products =[];
 var data = [];
@@ -88,9 +89,9 @@ const blends = [
 
 var counter = 0;
 const output = async()=>{
-    console.log("logging into db");
-    await connectDB(process.env.MONGO_URI);
-    console.log("logged in")
+    // console.log("logging into db");
+    // await connectDB(process.env.MONGO_URI);
+    // console.log("logged in")
     //get all products
     productNames = [];
     try{
@@ -98,15 +99,19 @@ const output = async()=>{
     }catch(err){
         console.log(err);
     }
-    console.log(products)
-    for (var i = 0; i<products.length; i++){
-        productNames.push(products[i].name);
+    try{
+        ordersMongo = await Order.find({})
+    }catch(err){
+        console.log(err);
+    }
+    for (var i = 0; i<ordersMongo.length; i++){
+        console.log(ordersMongo[0])
     }
 
 
     // lr = new LineByLineReader('C:/Users/harry/AppData/Roaming/Thunderbird/Profiles/1ogmaobo.default-release/ImapMail/imap.gmail.com/INBOX','utf8');
     // lr = new LineByLineReader('./INBOXtest','utf8');
-    lr = new LineByLineReader('/orders.txt','utf8');
+    lr = new LineByLineReader('orders.txt','utf8');
 
     
     lr.on('error', function (err) {
@@ -128,90 +133,191 @@ function findOrders(){
     for (var i = 0 ; i<data.length;i++){
         var foundOrder =false;
         var str = data[i];
-        if (str.includes('Order date '))// Phone: 0478 126 069 ABN: 41618895953          Order #G5505   Order date 08
+        //find new order
+        //Confirmation          To  *The Long Room Cafe Dungog*  Customer ID:10  
+        if (str.includes('Customer ID'))
         {
-            console.log(str);
-            var str2 = String(data[i+16]);// 16 - Phone: 0478 126 069 ABN: 41618895953          Order #G5515   Order date 08
-            if(str2.includes('Phone:')&& str2.includes('Order')){
-                //if order is 16 lines after
-                foundOrder = true;
-                i=i+16;
+            const order = {orderID:"",date:"",products:[],customerID:"",customerName:""};
+            //split string into array
+            var strArrayNameCustomerID = str.split(" ");
+
+            //get customer name
+            const findTo = (element) => element.match("To");
+            const arrayNumberForStartOfCustomerID = strArrayNameCustomerID.findIndex(findTo)+2
+            var customerNameStr = String();
+            var hasTwoAsterisks = false;
+            var whileCounterForFindingCustomerID = 0;
+            while(!hasTwoAsterisks){
+                customerNameStr += strArrayNameCustomerID[arrayNumberForStartOfCustomerID+whileCounterForFindingCustomerID] +" "
+                var asteriskCounter = 0;
+                if(customerNameStr){
+                    for (var j = 0 ;j<customerNameStr.length;j++){
+                        if(customerNameStr.charAt(j)=="*"){
+                            asteriskCounter ++;
+                        }
+                        if(asteriskCounter === 2){
+                            hasTwoAsterisks = true;
+                        }
+                    }
+
+                }
+                else{
+                    console.error("ERROR! could not find 2 asterisks in " + str)
+                    i= i++;
+                    whileCounterForFindingCustomerID = 100;
+                }
+                whileCounterForFindingCustomerID++;
             }
-            else{
-                //if order is 17 lines after
-                var str2 = String(data[i+17]);// 17 - Phone: 0478 126 069 ABN: 41618895953          Order #G5515   Order date 08
-                if(str2.includes('Phone:')&& str2.includes('Order')){
-                    //if order is 16 lines after
-                    foundOrder = true;
-                    i=i+17;
-                }
-            }
-            if(foundOrder){
-                const order = {orderID:"",date:"",products:[]};
-                var lineArray = str2.split(" ");
-                //get order id
-                const orderID = (element) => element.match("Order");
-                const arrayNumberForOrderID = lineArray.findIndex(orderID)+1
-                order.orderID = lineArray[arrayNumberForOrderID]
-
-                //get order day
-                const orderDay = (element) => element.match("date");
-                const arrayNumberForOrderDay = lineArray.findIndex(orderDay)+1
-                var day = lineArray[arrayNumberForOrderDay]
-
-                //get order month
-                i++;
-                var str3 = String(data[i])
-
-                // Get date
-                var lineArray = str3.split(" ");
-                var month = lineArray[0];
-                var year = lineArray[1];
-                var date = new Date(Date.parse(`${day} ${month} ${year} 00:00:00 GMT`));
-
-                order.date = date;
-
-                //get products
-                var products = [];
-                var productsStr = String();
-                while(!productsStr.includes("Subtotal")){
-                    productsStr +=(data[i]+" ")
-                    i++;
-                }
-
-                //go through each product of order
-                var lineArray = productsStr.split(" ");
-
-                const price = (element) => element.match("Price");
-                const arrayNumberForPrice = lineArray.findIndex(price);
-                //find first product
-                var k = arrayNumberForPrice+1;
-
-                while(lineArray[k]===""){
-                    k++;
-                }
-
-                var productName = String();
-                var str4 = String(lineArray[k]);
-                while(!str4.includes("SKU")){
-                    productName += (lineArray[k]+" ");
-                    k++;
-                    str4 = String(lineArray[k]);
-                }
-                console.log(productName);
-                //search string for products given in "Blends"                
-                // for(var k = 0; k<blends.length; k++){
-                //     if(productsStr.includes(blends[k].name)){
-                //         products.push(blends[k]);
-                //     }
-                // }
+            //remove asterisks
+            const removeAsterisksandSpace = (customerNameStr) =>{
+                let forbiddenChar = '*'
+                customerNameStr = customerNameStr.split(forbiddenChar).join('');
+                return customerNameStr.slice(0, -1);
                 
-
-                order.products = products;
-                orders.push(order);
-
             }
-    
+            order.customerName = (removeAsterisksandSpace(customerNameStr))
+
+
+            //get customer ID
+            for (var k = 0 ; k<strArrayNameCustomerID.length ; k++ ){
+                var temp = String(strArrayNameCustomerID[k]);
+                if (temp.includes("ID")){
+                    order.customerID = temp.slice(3);
+                }
+            }
+
+            //get order date
+            //find string - Phone: 0478 126 069 ABN: 41618895953          Order #G5521   Order date 11
+            for(var k = i ; k<data.length ; k++){
+                if(data[k].includes("ABN: ")){
+                    i = k;
+                    break;
+                }
+            }
+            var strArrayOrderDayID = data[i].split(" ");
+
+            //find day
+            const findDate = (element) => element.match("date");
+            const arrayNumberForOrderDay = strArrayOrderDayID.findIndex(findDate)+1
+            const day = strArrayOrderDayID[arrayNumberForOrderDay]
+        
+
+            //get orderID
+            var orderID = String()
+            for(var k = 0 ; k<strArrayOrderDayID.length ; k++){
+                if(strArrayOrderDayID[k].includes("#")){
+                    orderID = (strArrayOrderDayID[k])
+                }
+            }
+            const removeHashtag = (orderID) =>{
+                let forbiddenChar = '#'
+                orderID = orderID.split(forbiddenChar).join('');
+                return orderID;
+                
+            }
+            order.orderID = removeHashtag(orderID);
+
+
+            for(var k = i ; k<data.length ; k++){// Nov 2021   Delivery Date  18 Nov 2021              Item Qty Price     
+                if(data[k].includes("Item Qty Price")){
+                    i = k;
+                    break;
+                }
+            }
+            var strArrayOrderMonthYearItem = data[i].split(" ");
+
+            //get month
+            const month = strArrayOrderMonthYearItem[0];
+
+            //get year
+            const year = strArrayOrderMonthYearItem[1];
+
+            order.date = (new Date(`${day} ${month} ${year}`))
+
+
+            //get products ordered
+            var productsStr = String()
+            while(!productsStr.includes("Subtotal")){
+                productsStr +=(data[i]+" ")
+                i++;
+            }
+            const strArrayOrders = productsStr.split(" ")
+
+
+            //count how many different products
+            var amountOfDifferentProducts = 0;
+            for (var k = 0 ; k<strArrayOrders.length; k++){
+                if (strArrayOrders[k].includes("SKU")){
+                    amountOfDifferentProducts++;
+                }
+            }
+
+            order.products = amountOfDifferentProducts
+            var ordersStrArray = []
+            //remove whitespace DO THIS EVENTUALLY FOR EVERY SEARCH
+            for (var k = 0 ; k<strArrayOrders.length; k++){
+                if (strArrayOrders[k]!=""){
+                    ordersStrArray.push(strArrayOrders[k])
+                }
+            }
+            const findPrice = (element) => element.match("Price");
+            const arrayNumberForPrice = ordersStrArray.findIndex(findPrice)
+
+            //split products into seperate arrays
+            var productStrings = [];
+            var productString = "";
+            for (var k = arrayNumberForPrice+1 ; k<ordersStrArray.length; k++){
+                if (ordersStrArray[k].includes("SKU")){
+                    var orderFinished = false;
+                    while(!orderFinished){
+                        if(isNaN(ordersStrArray[k])){
+                            productString += ordersStrArray[k]+ " "
+                            k++
+                        }
+                        else{
+                            productString +=(ordersStrArray[k] + " ")
+                            productString +=(ordersStrArray[k+1])
+                            productStrings.push(productString);
+                            productString = "";
+                            k++
+                            orderFinished = true;
+
+                        }
+
+                    }
+                }
+                else{
+                    productString +=ordersStrArray[k]+" ";
+                }
+            }
+            //retrieve product name and amount
+
+            var products = [];
+            for (var k = 0 ; k<productStrings.length;k++){
+                var product = {name:"", amount:""};
+                const productStringArray = productStrings[k].split(" ")
+                var nameRead = false;
+                var name = "";
+                var index = 0;
+                while (!nameRead){
+                    var readString = productStringArray[index];
+                    if(readString.includes("SKU")){
+                        nameRead = true;
+                        index ++;
+                        break;
+                    }
+                    else{
+                        name += productStringArray[index]+" "
+                        index ++;
+                    }
+                }
+                product.name = name;
+                product.amount = productStringArray[productStringArray.length-2]
+                products.push(product);
+            }
+
+            order.products = products;
+            orders.push(order);
         }
     }
     if(orders.length === 0){
@@ -221,7 +327,9 @@ function findOrders(){
     for(var i = 0 ; i<orders.length ; i++){
         createOrder(orders[i]);
     }
-
+    //delete text file
+    // fs.truncate('orders.txt', 0, function(){console.log('deleting output.txt')})
+    console.log("finished reading and saving")
 
 }
 
@@ -253,6 +361,8 @@ const getAllProducts = async (product) => {
         console.error(err)
     }
 }
+
+
 
 
 exports.output = output;
