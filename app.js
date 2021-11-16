@@ -10,6 +10,10 @@ const counter = require("./counter")
 const port = 3000;
 app.use('/api/v1/orders', orders);
 
+app.get('/',(req,res)=>{
+  res.send("Home")
+})
+
 const start = async () => {
   try {
     console.log("logging into db");
@@ -26,7 +30,6 @@ const start = async () => {
 };
 const executeReadEmailScript = ()=>{
   const python = spawn(process.env.PYTHON_CMD, ['readEmails.py']);
-  console.log("Reading Emails")
   python.stdout.on('data', function (data) {
     dataToSend = data.toString();
    });
@@ -37,14 +40,12 @@ const executeReadEmailScript = ()=>{
 }
 const executeDeleteEmailsScript = ()=>{
   const python = spawn(process.env.PYTHON_CMD, ['deleteEmails.py']);
-  console.log("Deleting Emails")
   python.stdout.on('data', function (data) {
     dataToSend = data.toString();
    });
    python.on('close', (code) => {
      console.log(dataToSend)
       counter.output();
-      
     });
 }
 

@@ -4,7 +4,8 @@ import datetime
 from datetime import date
 from datetime import datetime, timedelta
 
-    
+print("Deleting mail")
+
 d = datetime.today() - timedelta(days=7) 
 dayNumber = d.day
 dayStr = ""
@@ -44,7 +45,6 @@ my_email = "harrycollinsglitchprogram@gmail.com"
 app_generated_password = "Harding1945!"
 
 a = 'BEFORE \"' + dateString + '\"'
-print(a)
 
 #initialize IMAP object for Gmail
 imap = imaplib.IMAP4_SSL("imap.gmail.com")
@@ -55,14 +55,13 @@ imap.login(my_email, app_generated_password)
 imap.select("INBOX")
 
 status, message_id_list = imap.search(None, a)
-print("Deleting mails")
 
 #convert the string ids to list of email ids
 for num in message_id_list[0].split():
     imap.store(num, "+FLAGS", "\\Deleted")
 
 
-print("All mails" + a + " been deleted")
+print("Mail from " + a + " has been deleted")
 
 # delete all the selected messages 
 imap.expunge()
