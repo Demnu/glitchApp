@@ -5,10 +5,7 @@ const connectDB = require('./db/connect');
 const Order = require('./models/Order')
 const Product = require('./models/Product');
 const { toNamespacedPath } = require('path');
-var productNames = [];
-var products =[];
-var data = [];
-var orders = [];
+
 
 const blends = [
     {       
@@ -89,24 +86,18 @@ const blends = [
 
 var counter = 0;
 const output = async()=>{
+    findOrders();
     // console.log("logging into db");
     // await connectDB(process.env.MONGO_URI);
     // console.log("logged in")
     //get all products
-    productNames = [];
-    try{
-        products = await Product.find({})
-    }catch(err){
-        console.log(err);
-    }
-    try{
-        ordersMongo = await Order.find({})
-    }catch(err){
-        console.log(err);
-    }
 
 
-    // lr = new LineByLineReader('C:/Users/harry/AppData/Roaming/Thunderbird/Profiles/1ogmaobo.default-release/ImapMail/imap.gmail.com/INBOX','utf8');
+}
+
+function readOutputTxt(){
+    var data = [];
+        // lr = new LineByLineReader('C:/Users/harry/AppData/Roaming/Thunderbird/Profiles/1ogmaobo.default-release/ImapMail/imap.gmail.com/INBOX','utf8');
     // lr = new LineByLineReader('./INBOXtest','utf8');
     lr = new LineByLineReader('orders.txt','utf8');
 
@@ -121,12 +112,32 @@ const output = async()=>{
     });
     
     lr.on('end', function () {
-        findOrders();
-        // All lines are read, file is closed now.
     });
+    return data;
+
 
 }
-function findOrders(){
+
+async function findOrders(){
+    var productNames = [];
+    var products =[];
+    var data = []
+    data = readOutputTxt();
+    var orders = [];
+    productNames = [];
+    try{
+        products = await Product.find({})
+    }catch(err){
+        console.log(err);
+    }
+    try{
+        ordersMongo = await Order.find({})
+    }catch(err){
+        console.log(err);
+    }
+
+
+
     for (var i = 0 ; i<data.length;i++){
         var foundOrder =false;
         var str = data[i];
@@ -337,7 +348,7 @@ function findOrders(){
     }
     //delete text file
     fs.truncate('orders.txt', 0, function(){console.log('deleting output.txt')})
-    orders = [];
+    data = [];
     console.log("finished reading and saving")
 
 }

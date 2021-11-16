@@ -25,7 +25,7 @@ const start = async () => {
   }
 };
 const executeReadEmailScript = ()=>{
-  const python = spawn('python3', ['readEmails.py']);
+  const python = spawn('python', ['readEmails.py']);
   console.log("Reading Emails")
   python.stdout.on('data', function (data) {
     dataToSend = data.toString();
@@ -36,7 +36,7 @@ const executeReadEmailScript = ()=>{
     });
 }
 const executeDeleteEmailsScript = ()=>{
-  const python = spawn('python3', ['deleteEmails.py']);
+  const python = spawn('python', ['deleteEmails.py']);
   console.log("Deleting Emails")
   python.stdout.on('data', function (data) {
     dataToSend = data.toString();
@@ -53,7 +53,7 @@ executeReadEmailScript();
 setInterval(async() => {
   console.log("Executing Script at " + new Date())
   executeReadEmailScript();
-}, 100000)
+}, 50000)
 
 
 
