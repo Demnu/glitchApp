@@ -104,9 +104,6 @@ const output = async()=>{
     }catch(err){
         console.log(err);
     }
-    for (var i = 0; i<ordersMongo.length; i++){
-        console.log(ordersMongo[0])
-    }
 
 
     // lr = new LineByLineReader('C:/Users/harry/AppData/Roaming/Thunderbird/Profiles/1ogmaobo.default-release/ImapMail/imap.gmail.com/INBOX','utf8');
@@ -311,7 +308,7 @@ function findOrders(){
                         index ++;
                     }
                 }
-                product.name = name;
+                product.name = name.slice(0, -1);
                 product.amount = productStringArray[productStringArray.length-2]
                 products.push(product);
             }
@@ -325,18 +322,32 @@ function findOrders(){
     }
 
     for(var i = 0 ; i<orders.length ; i++){
-        createOrder(orders[i]);
+        var duplicate =false;
+        console.log(orders[i].orderID)
+        for(var j = 0; j<ordersMongo.length ; j++){
+            // console.log(`Testinh ID:  mongo:${ordersMongo[j].orderID} and email: ${orders[i].orderID}`)
+            if(ordersMongo[j].orderID == orders[i].orderID){
+                duplicate = true;
+                // console.log(`Duplicate ID: ${ordersMongo[j].orderID}`)
+            }
+        }
+        if (!duplicate){
+            createOrder(orders[i]);
+        }
     }
     //delete text file
-    // fs.truncate('orders.txt', 0, function(){console.log('deleting output.txt')})
+    fs.truncate('orders.txt', 0, function(){console.log('deleting output.txt')})
     console.log("finished reading and saving")
 
 }
 
 const createOrder = async (order) => {
+
         try{
-            const task = await Order.create(order);
-            console.log(`Order ${order} saved`)
+                const task = await Order.create(order);
+                console.log(`Order ${order} saved`)
+            
+
 
         }catch(err){
             console.error(err)
@@ -346,7 +357,7 @@ const createOrder = async (order) => {
 const createProduct = async (product) => {
 try{
     const task = await Product.create(product);
-    console.log(`Product ${product} saved`)
+    console.log(`Product ${product.name} saved`)
 
 }catch(err){
     console.error(err)
