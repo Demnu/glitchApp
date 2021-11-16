@@ -11,7 +11,7 @@ const port = 3000;
 app.use('/api/v1/orders', orders);
 
 app.get('/',(req,res)=>{
-  res.send("Home")
+  res.send("HELLO WORLD")
 })
 
 const start = async () => {
