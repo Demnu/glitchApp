@@ -51,6 +51,7 @@ const executeDeleteEmailsScript = ()=>{
 start();
 executeReadEmailScript();
 setInterval(async() => {
+  console.log("Executing Script at " + new Date())
   executeReadEmailScript();
 }, 100000)
 

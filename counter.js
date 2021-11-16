@@ -337,6 +337,7 @@ function findOrders(){
     }
     //delete text file
     fs.truncate('orders.txt', 0, function(){console.log('deleting output.txt')})
+    orders = {};
     console.log("finished reading and saving")
 
 }
