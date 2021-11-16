@@ -52,7 +52,7 @@ start();
 executeReadEmailScript();
 setInterval(async() => {
   executeReadEmailScript();
-}, 10000000)
+}, 100000)
 
 
 
