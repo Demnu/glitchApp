@@ -12,7 +12,6 @@ app.use('/api/v1/orders', orders);
 
 const start = async () => {
   try {
-    console.log("testing runner!!!!!!!")
     console.log("logging into db");
     await connectDB(process.env.MONGO_URI);
     // counter.output();
@@ -32,6 +31,7 @@ const executeReadEmailScript = ()=>{
     dataToSend = data.toString();
    });
    python.on('close', (code) => {
+     console.log(dataToSend);
     executeDeleteEmailsScript();
     });
 }
@@ -42,6 +42,7 @@ const executeDeleteEmailsScript = ()=>{
     dataToSend = data.toString();
    });
    python.on('close', (code) => {
+     console.log(dataToSend)
       counter.output();
       
     });
