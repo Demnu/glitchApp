@@ -1,28 +1,23 @@
 const connectDB = require('../db/connect');
 
-const Order = require('../models/Order')
-const getAllOrders = (async (req, res) => {
-	Order.find({}, function (err, orders) {
-    var ordersMap = [];
+const Recipe = require('../models/Recipe')
+const getAllRecipes = (async (req, res) => {
+	Recipe.find({}, function (err, recipes) {
+    var recipesMap = [];
 
-    orders.forEach(function(order) {
-      ordersMap.push({id: order.orderID, customerName: order.customerName, date: order.date, products: order.products})
+    recipes.forEach(function(recipe) {
+      recipesMap.push({id: recipe.product})
     });
-    res.setHeader('Content-Range', orders.length)
-    res.send(ordersMap);
+    res.setHeader('Content-Range', recipes.length)
+    res.send(recipesMap);
   })
 })
-const getOrder = (async(req, res, next) => {
-  const { id: id } = req.params
-  const order = await Order.findOne({ orderID: id })
-  if(order){
-    const orderStr = {id: order.orderID, customerName: order.customerName, date: order.date, products: order.products}
-    res.status(200).send({ orderStr })
 
-  }
-
-})
-
+const createRecipe = async (req, res) => {
+  recipe = {product:"Haywire Blend Recipe"};
+  await Recipe.create(recipe)
+  res.status(201).json({ recipe })
+}
 
 
 // const createTask = asyncWrapper(async (req, res) => {
@@ -63,7 +58,7 @@ const getOrder = (async(req, res, next) => {
 // })
 
 module.exports = {
-  getAllOrders,
-  getOrder
+  getAllRecipes,
+  createRecipe
 
 }
