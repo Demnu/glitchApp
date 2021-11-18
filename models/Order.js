@@ -14,10 +14,15 @@ const OrderSchema = new mongoose.Schema({
   },
   products:{
     type:Array,
-    "product" : {
-      
+    "product" : {},
   },
+  customerID:{
+    type:String,
+  },
+  customerName:{
+    type:String,
   }
+
 })
 
 module.exports = mongoose.model('Order', OrderSchema)
