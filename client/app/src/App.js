@@ -17,7 +17,6 @@ import OrderList from './components/orderList/OrderList';
 const App = () => (
 <Admin dataProvider={dataProvider}>
   <Resource name="orders" list={OrderList} />
-  <Resource name="hello" list={OrderList} />
 </Admin>
 )
 
