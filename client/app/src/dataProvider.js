@@ -10,7 +10,7 @@ import {
 } from 'react-admin';
 import { stringify } from 'query-string';
 
-const API_URL = 'http://localhost:3000/api/v1';
+const API_URL = 'https://glitchhub.coffee/api/v1';
 
 /**
  * @param {String} type One of the constants appearing at the top of this file, e.g. 'UPDATE'
