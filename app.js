@@ -25,7 +25,7 @@ app.use(express.static(path.join(__dirname, "app", 'build')));
 
 
 app.get('/', function (req, res) {
-  res.sendFile(path.join(__dirname, 'client/app/build', 'index.html'));
+  res.sendFile(path.join(__dirname, '/app/build', 'index.html'));
 });
 
 const start = async () => {
