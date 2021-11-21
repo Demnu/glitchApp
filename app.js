@@ -21,11 +21,11 @@ app.use(function(req, res, next) {
 app.use('/api/v1/orders', orders);
 app.use('/api/v1/recipes', recipes);
 
-app.use(express.static(path.join("app", 'build')));
+app.use(express.static(path.join(__dirname, "app", 'build')));
 
 
 app.get('/', function (req, res) {
-  res.sendFile(path.join('/app/build', 'index.html'));
+  res.sendFile(path.join(__dirname, 'app/build', 'index.html'));
 });
 
 const start = async () => {
