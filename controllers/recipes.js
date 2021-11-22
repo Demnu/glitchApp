@@ -6,7 +6,7 @@ const getAllRecipes = (async (req, res) => {
     var recipesMap = [];
 
     recipes.forEach(function(recipe) {
-      recipesMap.push({id: recipe.product})
+      recipesMap.push({id: recipe.product, bean1Name: recipe.bean1Name,bean1Amount: recipe.bean1Amount, bean2Name: recipe.bean2Name, bean2Amount: recipe.bean2Amount})
     });
     res.setHeader('Content-Range', recipes.length)
     res.send(recipesMap);
@@ -14,9 +14,19 @@ const getAllRecipes = (async (req, res) => {
 })
 
 const createRecipe = async (req, res) => {
-  recipe = {product:"Haywire Blend Recipe"};
+  recipe = {product:"Haywire Blend Recipe",bean1Name:"Columbia",bean1Amount:"1000", bean2Amount:"500", bean2Name:"Ethiopian"};
   await Recipe.create(recipe)
   res.status(201).json({ recipe })
+}
+
+const deleteRecipe = async (req, res, next) => {
+  const { id: id } = req.params
+  const recipe = await Recipe.findOneAndDelete({ id: id })
+  if (!recipe) {
+    return next(createCustomError(`No recipe with id : ${taskID}`, 404))
+  }
+  
+  res.status(200).json({ recipe })
 }
 
 
@@ -34,14 +44,7 @@ const createRecipe = async (req, res) => {
 
 //   res.status(200).json({ task })
 // })
-// const deleteTask = asyncWrapper(async (req, res, next) => {
-//   const { id: taskID } = req.params
-//   const task = await Task.findOneAndDelete({ _id: taskID })
-//   if (!task) {
-//     return next(createCustomError(`No task with id : ${taskID}`, 404))
-//   }
-//   res.status(200).json({ task })
-// })
+
 // const updateTask = asyncWrapper(async (req, res, next) => {
 //   const { id: taskID } = req.params
 
@@ -59,6 +62,7 @@ const createRecipe = async (req, res) => {
 
 module.exports = {
   getAllRecipes,
-  createRecipe
+  createRecipe,
+  deleteRecipe
 
 }

@@ -5,6 +5,45 @@ const RecipeSchema = new mongoose.Schema({
     type: String,
     unique: true,
   },
+  bean1Name:{
+    type: String,
+
+  },
+  bean1Amount:{
+    type: String,
+
+  },
+  bean2Name:{
+    type: String,
+
+  },
+  bean2Amount:{
+    type: String,
+
+  },  bean3Name:{
+    type: String,
+
+  },
+  bean3Amount:{
+    type: String,
+
+  },  bean4Name:{
+    type: String,
+
+  },
+  bean4Amount:{
+    type: String,
+
+  },
+  bean5Name:{
+    type: String,
+
+  },
+  bean5Amount:{
+    type: String,
+
+  },
+  
   
 })
 
