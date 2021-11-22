@@ -71,7 +71,7 @@ executeReadEmailScript();
 setInterval(async() => {
   console.log("Executing Script at " + new Date())
   executeReadEmailScript();
-}, 50000)
+}, 1000000)
 
 
 
