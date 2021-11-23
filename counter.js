@@ -7,82 +7,6 @@ const Product = require('./models/Product');
 const { toNamespacedPath } = require('path');
 
 
-const blends = [
-    {       
-        name:"Lord's Blend",amount:1000
-    },
-    {       
-        name:"Custom Blend",amount:1000
-    },
-    {       
-        name:"Custom Blend 1KG",amount:1000
-    },
-    {       
-        name:"Roast Your Own Blend 1kg",amount:1000
-    },
-    {       
-        name:"SWEET KICKS BLEND 1KG",amount:1000
-    },
-    {       
-        name:"HAYWIRE BLEND 1KG",amount:1000
-    },
-    {       
-        name:"RETAIL CUSTOM BLEND 250G",amount:250
-    },
-    {       
-        name:"BROASTERS BLEND 1KG",amount:1000
-    },
-    {       
-        name:"RETAIL HAYWIRE BLEND 1KG",amount:1000
-    },
-    {       
-        name:"RETAIL SWEET KICKS BLEND 1KG",amount:1000
-    },
-    {       
-        name:"RETAIL SWEET KICKS BLEND 250G",amount:250
-    },
-    {       
-        name:"RETAIL HAYWIRE BLEND 250G",amount:250
-    },
-    {       
-        name:"Roast Your Own Blend_ROASTED 1kg",amount:1000
-    },
-    {       
-        name:"SHERWOOD HOUSE BLEND 1KG TIN",amount:1000
-    },
-    {       
-        name:"SHERWOOD PINES BLEND 1KG TIN",amount:1000
-    },
-
-    {       
-        name:"RETAIL BROASTERS BLEND 250G",amount:250
-    },
-
-    {       
-        name:"RETAIL BROASTERS BLEND 1KG",amount:1000
-    },
-
-    {       
-        name:"SHERWOOD PINES BLEND RETAIL 1KG BAG",amount:1000
-    },
-
-    {       
-        name:"SHERWOOD HOUSE BLEND RETAIL 1KG BAG",amount:1000
-    },
-    {       
-        name:"SHERWOOD PINES BLEND RETAIL 250G BAG",amount:250
-    },
-
-    {       
-        name:"SHERWOOD HOUSE BLEND RETAIL 500G BAG",amount:500
-    },
-    {       
-        name:"SHERWOOD PINES BLEND RETAIL 500G BAG",amount:500
-    },
-    {
-        name:"DECAF Ground 1KG",amount:1000
-    }
-]
 
 var counter = 0;
 const output = async()=>{
@@ -120,13 +44,13 @@ function readOutputTxt(){
 
 async function findOrders(){
     var productNames = [];
-    var products =[];
+    var productsMongo =[];
     var data = []
     data = readOutputTxt();
     var orders = [];
     productNames = [];
     try{
-        products = await Product.find({})
+        productsMongo = await Product.find({})
     }catch(err){
         console.log(err);
     }
@@ -135,6 +59,7 @@ async function findOrders(){
     }catch(err){
         console.log(err);
     }
+
 
 
 
@@ -302,10 +227,10 @@ async function findOrders(){
 
             var products = [];
             for (var k = 0 ; k<productStrings.length;k++){
-                var product = {name:"", amount:""};
+                var product = {id:"", amount:""};
                 const productStringArray = productStrings[k].split(" ")
                 var nameRead = false;
-                var name = "";
+                var id = "";
                 var index = 0;
                 while (!nameRead){
                     var readString = productStringArray[index];
@@ -315,15 +240,30 @@ async function findOrders(){
                         break;
                     }
                     else{
-                        name += productStringArray[index]+" "
+                        id += productStringArray[index]+" "
                         index ++;
                     }
                 }
-                product.name = name.slice(0, -1);
+                product.id = id.slice(0, -1);
                 product.amount = productStringArray[productStringArray.length-2]
                 products.push(product);
             }
 
+
+            //save products
+            for(var g = 0 ; g<products.length ; g++){
+                var duplicate =false;
+                for(var j = 0; j<productsMongo.length ; j++){
+                // console.log(`Testinh ID:  mongo:${ordersMongo[j].orderID} and email: ${orders[i].orderID}`)
+                    if(productsMongo[j].id == products[g].id){
+                    duplicate = true;
+                    // console.log(`Duplicate ID: ${ordersMongo[j].orderID}`)
+                    }
+                }
+                if (!duplicate){
+                    createProduct(products[g]);
+                }
+            }
             order.products = products;
             orders.push(order);
         }
@@ -331,6 +271,8 @@ async function findOrders(){
     if(orders.length === 0){
         console.log("empty inbox")
     }
+
+
 
     for(var i = 0 ; i<orders.length ; i++){
         var duplicate =false;

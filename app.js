@@ -3,6 +3,7 @@ const app = express();
 const connectDB = require('./db/connect');
 const orders = require('./routes/orders');
 const recipes = require('./routes/recipes');
+const products = require('./routes/products');
 const {spawn} = require('child_process');
 const path = require('path');
 
@@ -22,6 +23,7 @@ app.use(express.json());
 
 app.use('/api/v1/orders', orders);
 app.use('/api/v1/recipes', recipes);
+app.use('/api/v1/products', products);
 
 app.use(express.static(path.join(__dirname,'build')));
 
