@@ -39,7 +39,6 @@ const getRecipe = (async (req, res, next) => {
   var recipesMap = [];
 
   const recipe = await Recipe.findOne({ product: id })
-  recipesMap.push(recipe);
   if (!recipe) {
     res.status(404).send("No recipe with id: " + id)
   }
