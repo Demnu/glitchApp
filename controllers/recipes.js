@@ -36,14 +36,16 @@ const deleteRecipe = async (req, res, next) => {
 
 const getRecipe = (async (req, res, next) => {
   const { id: id } = req.params
-  console.log(id);
+  var recipesMap = [];
+
   const recipe = await Recipe.findOne({ product: id })
+  recipesMap.push(recipe);
   if (!recipe) {
     res.status(404).send("No recipe with id: " + id)
   }
   else{
-    var recipeFormatted = {id: recipe.product, bean1Name: recipe.bean1Name,bean1Amount: recipe.bean1Amount, bean2Name: recipe.bean2Name, bean2Amount: recipe.bean2Amount}
-    res.status(200).json(recipeFormatted);
+    recipesMap.push({id: recipe.product, bean1Name: recipe.bean1Name,bean1Amount: recipe.bean1Amount, bean2Name: recipe.bean2Name, bean2Amount: recipe.bean2Amount})
+    res.status(200).json(recipesMap);
 
   }
 })
