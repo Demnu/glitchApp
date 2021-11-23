@@ -42,7 +42,8 @@ const getRecipe = (async (req, res, next) => {
     res.status(404).send("No recipe with id: " + id)
   }
   else{
-    res.status(200).json(recipe);
+    var recipeFormatted = {id: recipe.product, bean1Name: recipe.bean1Name,bean1Amount: recipe.bean1Amount, bean2Name: recipe.bean2Name, bean2Amount: recipe.bean2Amount}
+    res.status(200).json(recipeFormatted);
 
   }
 })
