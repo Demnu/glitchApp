@@ -14,7 +14,7 @@ const getAllRecipes = (async (req, res) => {
 })
 
 const createRecipe = async (req, res) => {
-  recipe = {product:"Haywire Blend Recipe",bean1Name:"Columbia",bean1Amount:"1000", bean2Amount:"500", bean2Name:"Ethiopian"};
+  recipe = {product:"Haywire Blend Recipe",bean1Name:"Columbia",bean1Amount:"1000", bean2Name:"Ethiopian",bean2Amount:"500",bean3Name:"Ethiopian",bean3Amount:"500",bean4Name:"Ethiopian",bean4Amount:"500",bean5Name:"Columbia",bean5Amount:"1000", bean6Name:"Ethiopian",bean6Amount:"500",bean7Name:"Ethiopian",bean7Amount:"500",bean8Name:"Ethiopian",bean8Amount:"500", };
   await Recipe.create(recipe)
   res.status(201).json({ recipe })
 }

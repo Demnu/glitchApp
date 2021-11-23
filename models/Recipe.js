@@ -43,6 +43,30 @@ const RecipeSchema = new mongoose.Schema({
     type: String,
 
   },
+  bean6Name:{
+    type: String,
+
+  },
+  bean6Amount:{
+    type: String,
+
+  },
+  bean7Name:{
+    type: String,
+
+  },
+  bean7Amount:{
+    type: String,
+
+  },
+  bean8Name:{
+    type: String,
+
+  },
+  bean8Amount:{
+    type: String,
+
+  },
   
   
 })
