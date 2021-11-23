@@ -4,10 +4,11 @@ const router = express.Router()
 const {
   getAllRecipes,
   createRecipe,
-  deleteRecipe
+  deleteRecipe,
+  getRecipe,
 } = require('../controllers/recipes')
 
 router.route('/').get(getAllRecipes).post(createRecipe)
-router.route('/:id').delete(deleteRecipe)
+router.route('/:id').delete(deleteRecipe).get(getRecipe)
 
 module.exports = router

@@ -23,13 +23,29 @@ const deleteRecipe = async (req, res, next) => {
   const { id: id } = req.params
   const recipe = await Recipe.findOneAndDelete({ id: id })
   if (!recipe) {
-    return next(createCustomError(`No recipe with id : ${taskID}`, 404))
+    res.status(404).send("No recipe with id: " + id)
+  }
+  else{
+    res.status(200).json({ recipe })
+
   }
   
-  res.status(200).json({ recipe })
 }
 
 
+
+const getRecipe = (async (req, res, next) => {
+  const { id: id } = req.params
+  console.log(id);
+  const recipe = await Recipe.findOne({ product: id })
+  if (!recipe) {
+    res.status(404).send("No recipe with id: " + id)
+  }
+  else{
+    res.status(200).json(recipe);
+
+  }
+})
 // const createTask = asyncWrapper(async (req, res) => {
 //   const task = await Task.create(req.body)
 //   res.status(201).json({ task })
@@ -63,6 +79,7 @@ const deleteRecipe = async (req, res, next) => {
 module.exports = {
   getAllRecipes,
   createRecipe,
-  deleteRecipe
+  deleteRecipe,
+  getRecipe
 
 }
