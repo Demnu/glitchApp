@@ -23,7 +23,8 @@ const createRecipe = async (req, res) => {
 
 const deleteRecipe = async (req, res, next) => {
   const { id: id } = req.params
-  const recipe = await Recipe.findOneAndDelete({ id: id })
+  console.log(req.params)
+  const recipe = await Recipe.findOneAndDelete({ product: id })
   if (!recipe) {
     res.status(404).send("No recipe with id: " + id)
   }
