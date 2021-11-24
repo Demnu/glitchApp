@@ -11,8 +11,23 @@ const getAllProducts = (async (req, res) => {
     res.send(productsMap);
   })
 })
+
+const deleteProduct = async (req, res, next) => {
+  const { id: id } = req.params
+  console.log(req.params)
+  const product = await Product.findOneAndDelete({ id: id })
+  if (!product) {
+    res.status(404).send("No product with id: " + id)
+  }
+  else{
+    res.status(200).json({ product })
+
+  }
+  
+}
 module.exports = {
     getAllProducts,
+    deleteProduct
 
   }
   
