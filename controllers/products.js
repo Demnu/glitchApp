@@ -5,7 +5,7 @@ const getAllProducts = (async (req, res) => {
     var productsMap = [];
 
     products.forEach(function(product) {
-        productsMap.push({label : product.id})
+        productsMap.push({label : product.id, id : product.id})
     });
     res.setHeader('Content-Range', products.length)
     res.send(productsMap);
