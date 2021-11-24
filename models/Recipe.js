@@ -4,6 +4,7 @@ const RecipeSchema = new mongoose.Schema({
   product: {
     type: String,
     unique: true,
+    required: true
   },
   bean1Name:{
     type: String,
