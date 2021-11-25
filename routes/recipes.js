@@ -6,10 +6,11 @@ const {
   createRecipe,
   deleteRecipe,
   getRecipe,
-  updateRecipe
+  updateRecipe,
+  getRoastingList
 } = require('../controllers/recipes')
 
 router.route('/').get(getAllRecipes).post(createRecipe)
+router.route('/getRoastingList').get(getRoastingList);
 router.route('/:id').delete(deleteRecipe).get(getRecipe).patch(updateRecipe)
-
 module.exports = router

@@ -1,6 +1,7 @@
 const connectDB = require('../db/connect');
+const Order = require('../models/Order')
+const RecipeMongo = require('../models/Recipe')
 
-const Recipe = require('../models/Recipe')
 const getAllRecipes = (async (req, res) => {
 	Recipe.find({}, function (err, recipes) {
     var recipesMap = [];
@@ -62,11 +63,6 @@ const getRecipe = (async (req, res, next) => {
 
   }
 })
-// const createTask = asyncWrapper(async (req, res) => {
-//   const task = await Task.create(req.body)
-//   res.status(201).json({ task })
-// })
-
 
 const updateRecipe = (async (req, res, next) => {
   const { id: id } = req.params
@@ -84,11 +80,100 @@ const updateRecipe = (async (req, res, next) => {
   }
 })
 
+const getRoastingList = (async (req, res) => {
+  function Recipe(recipe){
+    this.product = recipe.product,
+    this.beans = [{bean:recipe.bean1Name,amount:recipe.bean1Amount},{bean:recipe.bean2Name ,amount:recipe.bean2Amount},{bean:recipe.bean3Name,amount:recipe.bean3Amount},{bean:recipe.bean4Name ,amount:recipe.bean4Amount},{bean:recipe.bean5Name,amount:recipe.bean5Amount},{bean:recipe.bean6Name ,amount:recipe.bean6Amount},{bean:recipe.bean7Name,amount:recipe.bean7Amount},{bean:recipe.bean8Name ,amount:recipe.bean8Amount}]
+    this.amountOrders = 0;
+    this.test = function(name){
+      console.log(name)
+    }
+    this.clearEmptyBeans = function(){
+      for (var i = this.beans.length-1 ; i >=0 ; i--){
+        if (this.beans[i].bean === ""){
+          this.beans.splice(i, 1);
+        }
+      }
+    }
+    this.clearEmptyBeans();
+    this.addToAmountOfOrders = function(qty){
+      this.amountOrders += Number(qty);
+    }
+  }
+  function BeanOrder(bean){
+    this.bean = bean,
+    this.amount = 0;
+    this.addToAmount = function(qty){
+      this.amount += Number(qty);
+    }
+  }
+  //Add all recipes to array
+  var recipes = []
+  const recipesMongo = await RecipeMongo.find({})
+  recipesMongo.forEach(function(recipe){
+    recipes.push(new Recipe(recipe));
+  })
+
+  //add beans to map no duplicates
+  var beansMap =  new Map()
+  for (var i = 0 ; i<recipes.length; i++){
+    for (var j = 0 ; j<recipes[i].beans.length; j++){
+      beansMap.set(recipes[i].beans[j].bean,recipes[i].beans[j].bean);
+    }
+  }
+
+  var roastingList =[]
+  beansMap.forEach(function(bean){
+    roastingList.push(new BeanOrder(bean))
+  })
+  //get Orders
+  var productsOrdered = [];
+  const orders = await Order.find({})
+  var amountOfCustomBlend = 0;
+  orders.forEach(function(order){
+    for (var i = 0 ; i <order.products.length ; i++){
+      productsOrdered.push(order.products[i]);
+      if(order.products[i].name === "RETAIL HAYWIRE BLEND 250G" ){
+        amountOfCustomBlend += Number(order.products[i].amount);
+      }
+    }
+  })
+
+  console.log(`CUSTOM BLEND - ${amountOfCustomBlend}`)
+  for (var i = 0 ; i<recipes.length; i++){
+    for(var j = 0; j<productsOrdered.length;j++){
+      if (recipes[i].product === productsOrdered[j].name){
+          recipes[i].addToAmountOfOrders(productsOrdered[j].amount)
+      }
+    }
+  }
+
+  for(var i = 0 ; i<roastingList.length;i++){
+    for (var j = 0 ; j <recipes.length;j++){
+      var qtyOfRecipe = recipes[j].amountOrders;
+      for (var k = 0 ; k <recipes[j].beans.length;k++){
+        if (roastingList[i].bean === recipes[j].beans[k].bean){
+          // console.log(`${roastingList[i].bean}   ${recipes[j].beans[k].bean}`)
+          roastingList[i].addToAmount(Number(recipes[j].beans[k].amount)*Number(qtyOfRecipe))
+        }
+      }
+    }
+  }
+
+  var roastingOrder
+  res.send(roastingList)
+})
+
+function getBeansFromRecipes(recipes){
+
+}
+
 module.exports = {
   getAllRecipes,
   createRecipe,
   deleteRecipe,
   getRecipe,
-  updateRecipe
+  updateRecipe,
+  getRoastingList
 
 }
