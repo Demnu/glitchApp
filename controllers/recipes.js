@@ -101,7 +101,7 @@ const getRoastingList = (async (req, res) => {
     }
   }
   function BeanOrder(bean){
-    this.bean = bean,
+    this.id = bean,
     this.amount = 0;
     this.addToAmount = function(qty){
       this.amount += Number(qty);
@@ -133,13 +133,13 @@ const getRoastingList = (async (req, res) => {
   orders.forEach(function(order){
     for (var i = 0 ; i <order.products.length ; i++){
       productsOrdered.push(order.products[i]);
-      if(order.products[i].name === "RETAIL HAYWIRE BLEND 250G" ){
-        amountOfCustomBlend += Number(order.products[i].amount);
-      }
+      // if(order.products[i].name === "RETAIL HAYWIRE BLEND 250G" ){
+      //   amountOfCustomBlend += Number(order.products[i].amount);
+      // }
     }
   })
 
-  console.log(`CUSTOM BLEND - ${amountOfCustomBlend}`)
+  // console.log(`CUSTOM BLEND - ${amountOfCustomBlend}`)
   for (var i = 0 ; i<recipes.length; i++){
     for(var j = 0; j<productsOrdered.length;j++){
       if (recipes[i].product === productsOrdered[j].name){
@@ -152,7 +152,7 @@ const getRoastingList = (async (req, res) => {
     for (var j = 0 ; j <recipes.length;j++){
       var qtyOfRecipe = recipes[j].amountOrders;
       for (var k = 0 ; k <recipes[j].beans.length;k++){
-        if (roastingList[i].bean === recipes[j].beans[k].bean){
+        if (roastingList[i].id === recipes[j].beans[k].bean){
           // console.log(`${roastingList[i].bean}   ${recipes[j].beans[k].bean}`)
           roastingList[i].addToAmount(Number(recipes[j].beans[k].amount)*Number(qtyOfRecipe))
         }
