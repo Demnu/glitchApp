@@ -3,9 +3,8 @@ const Order = require('../models/Order')
 const RecipeMongo = require('../models/Recipe')
 
 const getAllRecipes = (async (req, res) => {
-	Recipe.find({}, function (err, recipes) {
+	RecipeMongo.find({}, function (err, recipes) {
     var recipesMap = [];
-
     recipes.forEach(function(recipe) {
       recipesMap.push({_id:recipe._id, id: recipe.product, bean1Name: recipe.bean1Name,bean1Amount: recipe.bean1Amount, bean2Name: recipe.bean2Name, bean2Amount: recipe.bean2Amount})
     });
@@ -19,7 +18,7 @@ const createRecipe = async (req, res) => {
   recipe = {product: req.body.product, bean1Name: req.body.bean1Name}
   var duplicate = false;
   console.log(recipe)
-  await Recipe.create(req.body).catch(function (error){
+  await RecipeMongo.create(req.body).catch(function (error){
     console.log("duplicate")
     duplicate = true;
   })
@@ -36,7 +35,7 @@ const createRecipe = async (req, res) => {
 const deleteRecipe = async (req, res, next) => {
   const { id: id } = req.params
   console.log(req.params)
-  const recipe = await Recipe.findOneAndDelete({ product: id })
+  const recipe = await RecipeMongo.findOneAndDelete({ product: id })
   if (!recipe) {
     res.status(404).send("No recipe with id: " + id)
   }
@@ -53,7 +52,7 @@ const getRecipe = (async (req, res, next) => {
   const { id: id } = req.params
   var recipesMap = [];
 
-  const recipe = await Recipe.findOne({ _id: id })
+  const recipe = await RecipeMongo.findOne({ _id: id })
   if (!recipe) {
     res.status(404).send("No recipe with id: " + id)
   }
@@ -66,7 +65,7 @@ const getRecipe = (async (req, res, next) => {
 
 const updateRecipe = (async (req, res, next) => {
   const { id: id } = req.params
-  const recipe = await Recipe.findOneAndUpdate({ _id: id }, req.body, {
+  const recipe = await RecipeMongo.findOneAndUpdate({ _id: id }, req.body, {
     new: true,
     runValidators: true,
   })
