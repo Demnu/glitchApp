@@ -153,7 +153,7 @@ const getRoastingList = (async (req, res) => {
       for (var k = 0 ; k <recipes[j].beans.length;k++){
         if (roastingList[i].id === recipes[j].beans[k].bean){
           // console.log(`${roastingList[i].bean}   ${recipes[j].beans[k].bean}`)
-          roastingList[i].addToAmount(Number(recipes[j].beans[k].amount)*Number(qtyOfRecipe))
+          roastingList[i].addToAmount((Number(recipes[j].beans[k].amount)*Number(qtyOfRecipe))/1000)
         }
       }
     }
