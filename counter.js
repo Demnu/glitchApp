@@ -132,7 +132,7 @@ async function findOrders(){
             //find day
             const findDate = (element) => element.match("date");
             const arrayNumberForOrderDay = strArrayOrderDayID.findIndex(findDate)+1
-            const day = strArrayOrderDayID[arrayNumberForOrderDay]
+            const day = Number(strArrayOrderDayID[arrayNumberForOrderDay])+Number(1)
         
 
             //get orderID
