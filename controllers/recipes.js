@@ -233,7 +233,6 @@ const createRoastingList = (async (req, res) => {
       }
     }
   })
-  console.log(productsOrdered)
   // console.log(`HAYWIRE BLEND - ${amountOfCustomBlend}`)
   for (var i = 0 ; i<recipes.length; i++){
     for(var j = 0; j<productsOrdered.length;j++){
@@ -270,7 +269,6 @@ const createRoastingList = (async (req, res) => {
     productsList.forEach(function(savedProduct){
       console.log(`${product.id} - ${savedProduct.id}`)
       if (String(product.id).match(String(savedProduct.id))){
-        console.log("DUPLICATE")
         duplicate = true;
         savedProduct.amount = Number(savedProduct.amount) + Number(product.amount)
       }
@@ -281,7 +279,6 @@ const createRoastingList = (async (req, res) => {
     }
     
   });
-  console.log(productsList)
   var data = []
   data.push(roastingList)
   data.push(productsList)
