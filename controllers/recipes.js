@@ -216,7 +216,6 @@ const createRoastingList = (async (req, res) => {
   var ordersMongo = []
   for (var i = 0 ; i < ordersReq.length;i++){
     const order = await Order.findOne({ orderID: ordersReq[i] });
-    console.log(ordersReq[i])
     ordersMongo.push(order)
   }
 
@@ -225,9 +224,12 @@ const createRoastingList = (async (req, res) => {
   var amountOfCustomBlend = 0;
   ordersMongo.forEach(function(order){
     for (var i = 0 ; i <order.products.length ; i++){
-      productsOrdered.push(order.products[i]);
-      if(order.products[i].id === "RETAIL HAYWIRE BLEND 1KG" ){
-        amountOfCustomBlend += Number(order.products[i].amount);
+      if(!order.products[i].id){
+        productsOrdered.push({id: order.products[i].name, amount: order.products[i].amount})
+      }
+      else{
+        productsOrdered.push(order.products[i]);
+
       }
     }
   })
@@ -259,9 +261,30 @@ const createRoastingList = (async (req, res) => {
       roastingList.splice(i,1)
     }
   }
+
+
+
+  var productsList = []
+  productsOrdered.forEach(function(product){
+    var duplicate = false;
+    productsList.forEach(function(savedProduct){
+      console.log(`${product.id} - ${savedProduct.id}`)
+      if (String(product.id).match(String(savedProduct.id))){
+        console.log("DUPLICATE")
+        duplicate = true;
+        savedProduct.amount = Number(savedProduct.amount) + Number(product.amount)
+      }
+    })
+
+    if (!duplicate){
+      productsList.push(product)
+    }
+    
+  });
+  console.log(productsList)
   var data = []
   data.push(roastingList)
-  data.push(recipes)
+  data.push(productsList)
   res.status(200).send(data)
 })
 
