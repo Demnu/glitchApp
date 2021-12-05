@@ -68,8 +68,9 @@ async function findOrders(){
         var str = data[i];
         //find new order
         //Confirmation          To  *The Long Room Cafe Dungog*  Customer ID:10  
-        if (str.includes('Customer ID'))
+        if (str.includes('Customer ID') || (str.includes("Confirmation")&&(str.includes('Customer'))))
         {
+            console.log(str)
             const order = {orderID:"",date:"",products:[],customerID:"",customerName:""};
             //split string into array
             var strArrayNameCustomerID = str.split(" ");
