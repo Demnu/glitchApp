@@ -77,6 +77,9 @@ for i in mail_ids:
             if "Order Confirmation - Glitch Coffee" in mail_subject:
                 f.write(mail_subject)
                 f.write(mail_content)
+            if "Order Confirmation - ATTN." in mail_subject:
+                f.write(mail_subject)
+                f.write(mail_content)
 print("Done Saving")
 
 f.close
