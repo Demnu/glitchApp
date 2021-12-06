@@ -6,9 +6,9 @@ const getAllRecipes = (async (req, res) => {
 	RecipeMongo.find({}, function (err, recipes) {
     var recipesMap = [];
     recipes.forEach(function(recipe) {
+      console.log("found")
       recipesMap.push({_id:recipe._id, id: recipe.product, bean1Name: recipe.bean1Name,bean1Amount: recipe.bean1Amount, bean2Name: recipe.bean2Name, bean2Amount: recipe.bean2Amount})
     });
-    res.setHeader('Content-Range', recipes.length)
     res.send(recipesMap);
   })
 })
