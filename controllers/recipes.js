@@ -216,8 +216,9 @@ const createRoastingList = (async (req, res) => {
   var ordersReq = req.body.orderIDs
   var ordersMongo = []
   for (var i = 0 ; i < ordersReq.length;i++){
+    //BOTTLENECK
     const order = await Order.findOne({ orderID: ordersReq[i] });
-    
+    console.log(order)
     ordersMongo.push(order)
   }
 
@@ -232,8 +233,8 @@ const createRoastingList = (async (req, res) => {
       }
       else{
         productsOrdered.push(order.products[i]);
-
       }
+      console.log(order.products[i])
     }
   })
   for (var i = 0 ; i<recipes.length; i++){
@@ -251,7 +252,7 @@ const createRoastingList = (async (req, res) => {
         if (beansInRecipe[j].bean === roastingList[k].id){
           roastingList[k].addToAmount(Number(recipes[i].amountOrders)*Number(beansInRecipe[j].amount)/1000)
           if(Number(recipes[i].amountOrders)*Number(beansInRecipe[j].amount)/1000!=0){
-            // console.log(`Adding from recipe ${recipes[i].product} amount: ${recipes[i].amountOrders} \n ${Number(recipes[i].amountOrders)*Number(beansInRecipe[j].amount)/1000} to ${roastingList[k].id}`)
+            console.log(`Adding from recipe ${recipes[i].product} amount: ${recipes[i].amountOrders} \n ${Number(recipes[i].amountOrders)*Number(beansInRecipe[j].amount)/1000} to ${roastingList[k].id}`)
 
           }
         }
@@ -315,6 +316,7 @@ const createRoastingList = (async (req, res) => {
       
     }
   }
+  console.log("DONE")
   roastingList.sort();
   productsList.sort();
   var data = []
