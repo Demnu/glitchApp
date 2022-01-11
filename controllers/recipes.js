@@ -8,9 +8,7 @@ const getAllRecipes = (async (req, res) => {
     recipes.forEach(function(recipe) {
       console.log("found")
       var beans = [];
-      if (bean1Name!=""){
-        beans.push({beanName:bean1Name, beanAmount:bean1Amount})
-      }
+
       console.log(beans);
       
       recipesMap.push({_id:recipe._id, id: recipe.product, bean1Name: recipe.bean1Name,bean1Amount: recipe.bean1Amount, bean2Name: recipe.bean2Name, bean2Amount: recipe.bean2Amount})
