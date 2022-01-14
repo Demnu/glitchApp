@@ -17,6 +17,7 @@
     "event-stream": "^4.0.1",
     "express": "^4.17.1",
     "js-priority-queue": "^0.1.5",
+    "jsonwebtoken": "^8.5.1",
     "line-by-line": "^0.1.6",
     "mongoose": "^6.0.13",
     "python-shell": "^3.0.1"

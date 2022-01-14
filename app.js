@@ -8,6 +8,7 @@ const roasting = require('./routes/roasting');
 const {spawn} = require('child_process');
 const path = require('path');
 
+const jwt = require('jsonwebtoken')
 
 require('dotenv').config();
 const counter = require("./counter")
@@ -30,9 +31,10 @@ app.use('/api/v1/roasting', roasting);
 app.use(express.static(path.join(__dirname,'build')));
 
 
-app.get('/', function (req, res) {
+app.get('*', function (req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
+
 
 const start = async () => {
   try {
