@@ -53,6 +53,7 @@ const makeCalculation = async(req,res) =>{
   recipesMongo.forEach(recipe =>{
     productTally.forEach(product =>{
       if (recipe.product === product.id){
+        product.id = product.id + "*"
         recipes.push({product:product.id, tally:product.amount, beans:[{name: recipe.bean1Name, amount: recipe.bean1Amount, amountNeededToBeRoasted:0},{name: recipe.bean2Name, amount: recipe.bean2Amount, amountNeededToBeRoasted:0},{name: recipe.bean3Name, amount: recipe.bean3Amount, amountNeededToBeRoasted:0},{name: recipe.bean4Name, amount: recipe.bean4Amount, amountNeededToBeRoasted:0},{name: recipe.bean5Name, amount: recipe.bean5Amount, amountNeededToBeRoasted:0},{name: recipe.bean6Name, amount: recipe.bean6Amount, amountNeededToBeRoasted:0},{name: recipe.bean7Name, amount: recipe.bean7Amount, amountNeededToBeRoasted:0},{name: recipe.bean8Name, amount: recipe.bean8Amount, amountNeededToBeRoasted:0},]})
       }
     })
