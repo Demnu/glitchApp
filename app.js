@@ -10,10 +10,7 @@ const test = require('./routes/test');
 const {spawn} = require('child_process');
 const path = require('path');
 const cors = require("cors");
-var corsOptions = {
-  origin: "http://localhost:3000"
-};
-app.use(cors(corsOptions));
+
 const jwt = require('jsonwebtoken')
 
 require('dotenv').config();
@@ -33,8 +30,8 @@ app.use('/api/v1/orders', orders);
 app.use('/api/v1/recipes', recipes);
 app.use('/api/v1/products', products);
 app.use('/api/v1/roasting', roasting);
-app.use('/api/v1/auth', auth);
-app.use('/api/v1/test', test);
+// app.use('/api/v1/auth', auth);
+// app.use('/api/v1/test', test);
 
 app.use(express.static(path.join(__dirname,'build')));
 
