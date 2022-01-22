@@ -5,10 +5,13 @@ const orders = require('./routes/orders');
 const recipes = require('./routes/recipes');
 const products = require('./routes/products');
 const roasting = require('./routes/roasting');
+const user = require('./routes/user');
 const {spawn} = require('child_process');
 const path = require('path');
-
-const jwt = require('jsonwebtoken')
+const auth = require("./middleware/auth");
+var cookieParser = require('cookie-parser');
+app.use(express.json());
+app.use(cookieParser());
 
 require('dotenv').config();
 const counter = require("./counter")
@@ -21,20 +24,30 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
   next();
 });
-app.use(express.json());
 
-app.use('/api/v1/orders', orders);
-app.use('/api/v1/recipes', recipes);
-app.use('/api/v1/products', products);
-app.use('/api/v1/roasting', roasting);
+app.use('/api/v1/orders', auth, orders);
+app.use('/api/v1/recipes', auth, recipes);
+app.use('/api/v1/products', auth, products);
+app.use('/api/v1/roasting', auth, roasting);
+app.use('/api/v1/user', user);
+
 
 
 app.use(express.static(path.join(__dirname,'build')));
 
-
-app.get('/*', function (req, res) {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+app.get('/api/v1/refresh', function (req, res) {
+  const refreshToken = req.body.token
+  if(!refreshToken){
+    return res.status(401).send("You are not authenticated!")
+  }
 });
+if (true){
+  app.get('/*', function (req, res) {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  });
+}else{
+  
+}
 
 
 const start = async () => {

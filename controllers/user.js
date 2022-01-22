@@ -4,9 +4,8 @@ const Order = require('../models/Order')
 const Product = require('../models/Product')
 const Recipe = require('../models/Recipe')
 const User = require('../models/User')
-
-import {hash} from 'bcryptjs'
-
+const {hash, compare} = require('bcryptjs')
+const {sign} = require ('jsonwebtoken')
 const register = async (req,res) =>{
     const hashedPassword = await hash(req.body.password,12);
     await User.create({
@@ -16,9 +15,37 @@ const register = async (req,res) =>{
         console.log(e)
     })
     
+    res.status(200)
 
+}
 
-
+const login = async(req, res) =>{
+  const user = await User.findOne({email: req.body.email})
+  var error;
+  var valid = false;
+  try{
+    if(!user){
+      error = "Could not find user"
+      throw new Error("could not find user");
+    }
+    valid = await compare(req.body.password, user.password)
+    if(!valid){
+      error = "Incorrect password"
+      throw new Error("incorrect password");
+    }
+    var token = sign({userID:String(user._id), email: String(user.email), isAdmin: true},process.env.TOKEN_KEY,{expiresIn:"2m"})
+    var refreshToken = sign({userID:String(user._id), email: String(user.email), isAdmin: true},process.env.REFRESH_TOKEN_KEY,{expiresIn:"2m"})
+    await User.updateOne({_id: user._id}, {refreshToken: refreshToken})
+    res.status(200)
+    .cookie('refreshToken', token, {
+      httpOnly: true,
+      path: '/refreshToken'
+    })
+    .send({token,refreshToken});
+  }
+  catch(e){
+    res.status(406).send(error);
+  }
 
 
 }
@@ -56,9 +83,7 @@ const deleteCalculation = async (req, res, next) => {
 
 
 module.exports = {
-  saveCalculation,
-  getCalculations,
-  deleteCalculation,
-  makeCalculation
+  register,
+  login
 
 }
