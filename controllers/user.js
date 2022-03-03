@@ -1,89 +1,111 @@
-const connectDB = require('../db/connect');
-const Calculation = require('../models/Calculation')
-const Order = require('../models/Order')
-const Product = require('../models/Product')
-const Recipe = require('../models/Recipe')
-const User = require('../models/User')
-const {hash, compare} = require('bcryptjs')
-const {sign} = require ('jsonwebtoken')
-const register = async (req,res) =>{
-    const hashedPassword = await hash(req.body.password,12);
-    await User.create({
-        email: req.body.email,
-        password: hashedPassword
-    }).catch( e =>{
-        console.log(e)
-    })
-    
-    res.status(200)
+const { createAccessToken, createRefreshToken } = require("./auth");
+const User = require("../models/User");
+const { hash, compare } = require("bcryptjs");
+const { verify } = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+var refreshTokens = [];
+const register = async (req, res) => {
+  const hashedPassword = await hash(req.body.password, 12);
+  await User.create({
+    email: req.body.email,
+    password: hashedPassword,
+  }).catch((e) => {
+    console.log(e);
+  });
 
-}
+  res.status(200);
+};
 
-const login = async(req, res) =>{
-  const user = await User.findOne({email: req.body.email})
+const login = async (req, res) => {
+  const user = await User.findOne({ email: req.body.email });
   var error;
   var valid = false;
-  try{
-    if(!user){
-      error = "Could not find user"
+  try {
+    if (!user) {
+      error = "Could not find user";
       throw new Error("could not find user");
     }
-    valid = await compare(req.body.password, user.password)
-    if(!valid){
-      error = "Incorrect password"
+    valid = await compare(req.body.password, user.password);
+    if (!valid) {
+      error = "Incorrect password";
       throw new Error("incorrect password");
     }
-    var token = sign({userID:String(user._id), email: String(user.email), isAdmin: true},process.env.TOKEN_KEY,{expiresIn:"2m"})
-    var refreshToken = sign({userID:String(user._id), email: String(user.email), isAdmin: true},process.env.REFRESH_TOKEN_KEY,{expiresIn:"2m"})
-    await User.updateOne({_id: user._id}, {refreshToken: refreshToken})
-    res.status(200)
-    .cookie('refreshToken', token, {
-      httpOnly: true,
-      path: '/refreshToken'
-    })
-    .send({token,refreshToken});
-  }
-  catch(e){
+
+    var refreshToken = createRefreshToken(user);
+    refreshTokens.push(refreshToken);
+    await User.updateOne({ _id: user._id }, { refreshToken: refreshToken });
+    res
+      .status(200)
+      .cookie("ADGKaPdSgVkYp3s6v9y$BEHMcQ", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        SameSite: "none",
+        // secure: true,
+      })
+      .send({ token: createAccessToken(user) });
+  } catch (e) {
     res.status(406).send(error);
   }
+};
 
-
-}
-
-const saveCalculation = async (req, res) => {
-  var date = new Date();
-
-  var calculation = {title: req.body.title, date:req.body.date, orderIDs:req.body.orderIDs , products: req.body.products, beans: req.body.beans}
-  await Calculation.create(calculation);
-  res.status(200).json(calculation)
-
-}
-
-const getCalculations = (async (req, res) => {
-	Calculation.find({}, function (err, calculations) {
-    var calculationsMap = [];
-    calculations.forEach(function(calculation) {
-      calculationsMap.push({id:calculation._id, title:calculation.title, date:calculation.date, products:calculation.products, beans:calculation.beans, orderIDs:calculation.orderIDs})
-    });
-    res.send(calculationsMap);
-  })
-})
-
-const deleteCalculation = async (req, res, next) => {
-  const { id: id } = req.params
-  const recipe = await Calculation.findOneAndDelete({ _id: id })
-  if (!recipe) {
-    res.status(404).send("No recipe with id: " + id)
+const refresh = async (req, res) => {
+  const refreshToken = req.body.token;
+  if (!refreshToken) {
+    return res.status(401).send("You are not authenticated");
   }
-  else{
-    res.status(200).json({ recipe })
-
+  if (!refreshTokens.includes(refreshToken)) {
+    return res.status(401).send("Refresh token is not valid");
   }
-}
+  verify(refreshToken, process.env.REFRESH_TOKEN_KEY, (err, user) => {
+    console.log(user);
+    refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
 
+    const newRefreshToken = createRefreshToken(user);
+    refreshTokens.push(newRefreshToken);
+    res.status(400).json({ accessToken: createAccessToken(user) });
+  });
+};
 
+const refreshToken = async (req, res) => {
+  const token = req.cookies.ADGKaPdSgVkYp3s6v9y$BEHMcQ;
+  if (!token) {
+    return res.status(401).send({ ok: false, accessToken: "" });
+  }
+  var payload = null;
+  try {
+    payload = verify(token, process.env.REFRESH_TOKEN_KEY);
+  } catch (err) {
+    console.log(err);
+    return res.status(401).send({ ok: false, accessToken: "" });
+  }
+  const user = await User.findOne({ _id: payload.userID });
+  if (!user) {
+    return res.status(401).send({ ok: false, accessToken: "" });
+  }
+
+  res
+    .status(200)
+    .cookie("ADGKaPdSgVkYp3s6v9y$BEHMcQ", createRefreshToken(user), {
+      httpOnly: true,
+      // secure: true,
+    })
+    .send({ ok: true, accessToken: createAccessToken(user) });
+};
+
+const logout = async (req, res) => {
+  const refreshToken = req.body.token;
+  refreshTokens = refreshTokens.filter((token) => token != refreshToken);
+  res.status(200).json("Logged out");
+};
+
+const readSavedRefreshTokens = async (req, res) => {
+  res.json(refreshTokens);
+};
 module.exports = {
   register,
-  login
-
-}
+  login,
+  refresh,
+  readSavedRefreshTokens,
+  logout,
+  refreshToken,
+};
