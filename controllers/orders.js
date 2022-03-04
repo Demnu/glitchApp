@@ -1,8 +1,6 @@
 const Order = require("../models/Order");
 
 const getAllOrders = async (req, res) => {
-  console.log("hello");
-  console.log(req);
   Order.find({}, function (err, orders) {
     var ordersMap = [];
 

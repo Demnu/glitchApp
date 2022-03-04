@@ -30,8 +30,11 @@ app.use(function (req, res, next) {
     );
   next();
 });
+app.options("/*", (_, res) => {
+  res.sendStatus(200);
+});
 
-app.use("/api/v1/orders", orders);
+app.use("/api/v1/orders", auth, orders);
 app.use("/api/v1/recipes", auth, recipes);
 app.use("/api/v1/products", auth, products);
 app.use("/api/v1/roasting", auth, roasting);
@@ -47,7 +50,11 @@ app.get("/api/v1/refresh", function (req, res) {
 });
 if (true) {
   app.get("/*", function (req, res) {
-    res.sendFile(path.join(__dirname, "build", "index.html"));
+    if (!res.cookie.ADGKaPdSgVkYp3s6v9y$BEHMcQ) {
+      res.send("hello");
+    } else {
+      res.sendFile(path.join(__dirname, "build", "index.html"));
+    }
   });
 } else {
 }

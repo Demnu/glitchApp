@@ -30,7 +30,7 @@ const login = async (req, res) => {
       error = "Incorrect password";
       throw new Error("incorrect password");
     }
-
+    console.log("hello");
     var refreshToken = createRefreshToken(user);
     refreshTokens.push(refreshToken);
     await User.updateOne({ _id: user._id }, { refreshToken: refreshToken });
@@ -38,11 +38,14 @@ const login = async (req, res) => {
       .status(200)
       .cookie("ADGKaPdSgVkYp3s6v9y$BEHMcQ", refreshToken, {
         httpOnly: true,
-        secure: true,
+        secure: false,
         SameSite: "none",
         // secure: true,
       })
-      .send({ token: createAccessToken(user) });
+      .send({
+        token: createAccessToken(user),
+        refreshToken: createRefreshToken(user),
+      });
   } catch (e) {
     res.status(406).send(error);
   }
