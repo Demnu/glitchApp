@@ -18,7 +18,7 @@ const counter = require("./counter");
 const port = 3000;
 app.use(function (req, res, next) {
   res.header("Access-Control-Expose-Headers", "X-Total-Count, Content-Range");
-  res.header("Access-Control-Allow-Origin", "http://localhost:3001"),
+  res.header("Access-Control-Allow-Origin", "https://glitchhub.coffee"),
     res.header("Access-Control-Allow-Credentials", "true"),
     res.header(
       "Access-Control-Allow-Methods",
