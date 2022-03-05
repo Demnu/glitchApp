@@ -3,6 +3,8 @@ const User = require("../models/User");
 const { hash, compare } = require("bcryptjs");
 const { verify } = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+
 var refreshTokens = [];
 const register = async (req, res) => {
   const hashedPassword = await hash(req.body.password, 12);
@@ -30,7 +32,6 @@ const login = async (req, res) => {
       error = "Incorrect password";
       throw new Error("incorrect password");
     }
-    console.log("hello");
     var refreshToken = createRefreshToken(user);
     refreshTokens.push(refreshToken);
     await User.updateOne({ _id: user._id }, { refreshToken: refreshToken });
@@ -104,6 +105,22 @@ const logout = async (req, res) => {
 const readSavedRefreshTokens = async (req, res) => {
   res.json(refreshTokens);
 };
+
+const authenticate = (req, res) => {
+  const token = req.cookies.ADGKaPdSgVkYp3s6v9y$BEHMcQ;
+  if (!token) {
+    return res.status(403).send("A token is required for authentication");
+  }
+  try {
+    const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_KEY);
+    req.user = decoded;
+  } catch (err) {
+    console.log(err);
+    return res.status(401).send(err);
+  }
+  return res.status(200).send("Valid Authentication");
+};
+
 module.exports = {
   register,
   login,
@@ -111,4 +128,5 @@ module.exports = {
   readSavedRefreshTokens,
   logout,
   refreshToken,
+  authenticate,
 };

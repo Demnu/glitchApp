@@ -48,16 +48,10 @@ app.get("/api/v1/refresh", function (req, res) {
     return res.status(401).send("You are not authenticated!");
   }
 });
-if (true) {
-  app.get("/*", function (req, res) {
-    if (!res.cookie.ADGKaPdSgVkYp3s6v9y$BEHMcQ) {
-      res.send("hello");
-    } else {
-      res.sendFile(path.join(__dirname, "build", "index.html"));
-    }
-  });
-} else {
-}
+
+app.get("/*", function (req, res) {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
 
 const start = async () => {
   try {

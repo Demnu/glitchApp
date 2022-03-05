@@ -7,10 +7,13 @@ const {
   readSavedRefreshTokens,
   logout,
   refreshToken,
+  authenticate,
 } = require("../controllers/user");
 
 router.route("/register").post(register);
+router.route("/register").get(register);
 router.route("/login").post(login);
 router.route("/logout").post(logout);
 router.route("/refresh").post(refreshToken).get(readSavedRefreshTokens);
+router.route("/authenticate").get(authenticate);
 module.exports = router;
