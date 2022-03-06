@@ -35,18 +35,13 @@ const login = async (req, res) => {
     var refreshToken = createRefreshToken(user);
     refreshTokens.push(refreshToken);
     await User.updateOne({ _id: user._id }, { refreshToken: refreshToken });
-    res
-      .status(200)
-      .cookie("ADGKaPdSgVkYp3s6v9y$BEHMcQ", refreshToken, {
-        httpOnly: true,
-        secure: false,
-        SameSite: "none",
-        // secure: true,
-      })
-      .send({
-        token: createAccessToken(user),
-        refreshToken: createRefreshToken(user),
-      });
+    res.status(200).cookie("ADGKaPdSgVkYp3s6v9y$BEHMcQ", refreshToken, {
+      expires: new Date(253402300000000),
+      httpOnly: true,
+      secure: false,
+      SameSite: "none",
+      // secure: true,
+    });
   } catch (e) {
     res.status(406).send(error);
   }
