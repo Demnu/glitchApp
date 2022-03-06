@@ -35,13 +35,16 @@ const login = async (req, res) => {
     var refreshToken = createRefreshToken(user);
     refreshTokens.push(refreshToken);
     await User.updateOne({ _id: user._id }, { refreshToken: refreshToken });
-    res.status(200).cookie("ADGKaPdSgVkYp3s6v9y$BEHMcQ", refreshToken, {
-      expires: new Date(253402300000000),
-      httpOnly: true,
-      secure: false,
-      SameSite: "none",
-      // secure: true,
-    });
+    res
+      .status(200)
+      .cookie("ADGKaPdSgVkYp3s6v9y$BEHMcQ", refreshToken, {
+        expires: new Date(253402300000000),
+        httpOnly: true,
+        secure: false,
+        SameSite: "none",
+        // secure: true,
+      })
+      .send();
   } catch (e) {
     res.status(406).send(error);
   }
@@ -91,17 +94,17 @@ const refreshToken = async (req, res) => {
     .send({ ok: true, accessToken: createAccessToken(user) });
 };
 
-const logout = async (req, res) => {
-  const refreshToken = req.body.token;
-  refreshTokens = refreshTokens.filter((token) => token != refreshToken);
-  res.status(200).json("Logged out");
-};
+// const logout = async (req, res) => {
+//   const refreshToken = req.body.token;
+//   refreshTokens = refreshTokens.filter((token) => token != refreshToken);
+//   res.status(200).json("Logged out");
+// };
 
 const readSavedRefreshTokens = async (req, res) => {
   res.json(refreshTokens);
 };
 
-const authenticate = (req, res) => {
+const authenticate = async (req, res) => {
   const token = req.cookies.ADGKaPdSgVkYp3s6v9y$BEHMcQ;
   if (!token) {
     return res.status(403).send("A token is required for authentication");
@@ -116,6 +119,13 @@ const authenticate = (req, res) => {
   return res.status(200).send("Valid Authentication");
 };
 
+const logout = async (req, res) => {
+  console.log(req.cookies.ADGKaPdSgVkYp3s6v9y$BEHMcQ);
+  console.log("hello");
+  res.clearCookie("ADGKaPdSgVkYp3s6v9y$BEHMcQ");
+  res.status(200).send("Logged Out");
+};
+
 module.exports = {
   register,
   login,
@@ -124,4 +134,5 @@ module.exports = {
   logout,
   refreshToken,
   authenticate,
+  logout,
 };
