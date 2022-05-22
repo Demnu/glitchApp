@@ -44,6 +44,12 @@ const login = async (req, res) => {
         SameSite: "none",
         // secure: true,
       })
+      .cookie("hasCookie", "true", {
+        expires: new Date(253402300000000),
+        httpOnly: false,
+        secure: false,
+        SameSite: "none",
+      })
       .send();
   } catch (e) {
     res.status(406).send(error);
@@ -121,7 +127,6 @@ const authenticate = async (req, res) => {
 
 const logout = async (req, res) => {
   console.log(req.cookies.ADGKaPdSgVkYp3s6v9y$BEHMcQ);
-  console.log("hello");
   res.clearCookie("ADGKaPdSgVkYp3s6v9y$BEHMcQ");
   res.status(200).send("Logged Out");
 };

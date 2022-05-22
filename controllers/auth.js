@@ -7,7 +7,7 @@ const createAccessToken = (user) => {
       isAdmin: user.isAdmin,
     },
     process.env.TOKEN_KEY,
-    { expiresIn: "1m" }
+    { expiresIn: "100d" }
   ));
 };
 
@@ -19,7 +19,7 @@ const createRefreshToken = (user) => {
       isAdmin: user.isAdmin,
     },
     process.env.REFRESH_TOKEN_KEY,
-    { expiresIn: "2m" }
+    { expiresIn: "100d" }
   ));
 };
 
