@@ -64,6 +64,7 @@ const getUnusedProducts = (async (req, res) => {
       sortedList.push(unusedProducts[i])
     }
   }
+  unusedProducts = sortedList;
   res.status(200).send({ sortedList })
 })
 
