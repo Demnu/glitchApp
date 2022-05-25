@@ -6,6 +6,7 @@ const Order = require("./models/Order");
 const Product = require("./models/Product");
 const { toNamespacedPath } = require("path");
 
+
 var counter = 0;
 const output = async () => {
   findOrders();
