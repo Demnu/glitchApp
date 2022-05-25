@@ -65,7 +65,7 @@ const getUnusedProducts = (async (req, res) => {
     }
   }
   unusedProducts = sortedList;
-  res.status(200).send({ sortedList })
+  res.status(200).send({ unusedProducts })
 })
 
 
