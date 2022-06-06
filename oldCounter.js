@@ -5,10 +5,20 @@ const connectDB = require("./db/connect");
 const Order = require("./models/Order");
 const Product = require("./models/Product");
 const { toNamespacedPath } = require("path");
-let productsMongo = [];
-let ordersMongo = [];
+
+var counter = 0;
 const output = async () => {
-  var lines = [];
+  findOrders();
+  // console.log("logging into db");
+  // await connectDB(process.env.MONGO_URI);
+  // console.log("logged in")
+  //get all products
+};
+
+function readOutputTxt() {
+  var data = [];
+  // lr = new LineByLineReader('C:/Users/harry/AppData/Roaming/Thunderbird/Profiles/1ogmaobo.default-release/ImapMail/imap.gmail.com/INBOX','utf8');
+  // lr = new LineByLineReader('./INBOXtest','utf8');
   lr = new LineByLineReader("orders.txt", "utf8");
 
   lr.on("error", function (err) {
@@ -17,209 +27,13 @@ const output = async () => {
 
   lr.on("line", function (line) {
     // 'line' contains the current line without the trailing newline character.
-    lines.push(line);
+    data.push(line);
   });
 
-  lr.on("end", function () {
-    readEmails(lines);
-  });
-};
-async function readEmails(lines) {
-  try {
-    productsMongo = await Product.find({});
-  } catch (err) {
-    console.log(err);
-  }
-  try {
-    ordersMongo = await Order.find({});
-  } catch (err) {
-    console.log(err);
-  }
-  let wordsList = splitLinesIntoSeperateWords(lines);
-  let ordersWordList = splitListIntoOrders(wordsList);
-  let orders = createOrderObjects(ordersWordList);
-
-  for (var i = 0; i < orders.length; i++) {
-    var duplicate = false;
-    console.log(orders[i].orderID);
-    for (var j = 0; j < ordersMongo.length; j++) {
-      if (ordersMongo[j].orderID == orders[i].orderID) {
-        duplicate = true;
-      }
-    }
-    if (!duplicate) {
-      createOrder(orders[i]);
-    }
-  }
-  //delete text file
-  fs.truncate("orders.txt", 0, function () {
-    console.log("deleting output.txt");
-  });
-  data = [];
-  console.log("finished reading and saving");
-}
-function createOrderObjects(ordersWordList) {
-  let orders = [];
-
-  for (let orderArray of ordersWordList) {
-    let order = {
-      orderID: "",
-      date: "",
-      products: [],
-      customerID: "",
-      customerName: "",
-    };
-    //get customer name and customer id
-    order = get_customerName_customerID(orderArray, order);
-    //get date and order id
-    order = get_date_orderID(orderArray, order);
-    order = getProducts(orderArray, order);
-    orders.push(order);
-  }
-  return orders;
-}
-function getProducts(order, orderObject) {
-  let products = [];
-  const isWord_Price = (element) => element === "Price";
-  const indexPrice = order.findIndex(isWord_Price);
-  const isWord_Subtotal = (element) => element === "Subtotal";
-  const indexSubtotal = order.findIndex(isWord_Subtotal);
-
-  order = order.slice(indexPrice + 1, indexSubtotal);
-  const isWord_SKU = (element) => element.includes("SKU");
-
-  let productsRead = false;
-  while (true) {
-    let indexSKU = order.findIndex(isWord_SKU);
-    if (indexSKU < 0) {
-      break;
-    }
-    var product = { id: "", amount: "" };
-    for (let i = 0; i < indexSKU; i++) {
-      product.id += order[i] + " ";
-    }
-    for (let i = indexSKU + 1; i < order.length; i++) {
-      if (order[i].includes("$")) {
-        product.amount = order[i - 1];
-        order = order.slice(i + 1);
-        break;
-      }
-    }
-    product.id = product.id.slice(0, -1);
-    products.push(product);
-  }
-
-  orderObject.products = products;
-  for (var g = 0; g < products.length; g++) {
-    var duplicate = false;
-    for (var j = 0; j < productsMongo.length; j++) {
-      if (productsMongo[j].id == products[g].id) {
-        duplicate = true;
-      }
-    }
-    if (!duplicate) {
-      createProduct(products[g]);
-    }
-  }
-  return orderObject;
+  lr.on("end", function () {});
+  return data;
 }
 
-function get_customerName_customerID(order, orderObject) {
-  let customerName = "";
-  let asteriskCounter = 0;
-  let hasTwoAsterisks = false;
-  let customerIDIndex;
-  const isWord_To = (element) => element === "To";
-  const indexTo = order.findIndex(isWord_To);
-  for (let i = indexTo + 1; i < order.length; i++) {
-    if (hasTwoAsterisks) {
-      break;
-    }
-    customerName += order[i] + " ";
-    for (var j = 0; j < customerName.length; j++) {
-      if (customerName.charAt(j) == "*") {
-        asteriskCounter++;
-        if (asteriskCounter === 2) {
-          hasTwoAsterisks = true;
-          customerIDIndex = i + 2;
-        }
-      }
-    }
-    asteriskCounter = 0;
-  }
-  const removeAsterisksandSpace = (customerNameStr) => {
-    let forbiddenChar = "*";
-    customerNameStr = customerNameStr.split(forbiddenChar).join("");
-    return customerNameStr.slice(0, -1);
-  };
-  orderObject.customerName = removeAsterisksandSpace(customerName);
-  orderObject.customerID = order[customerIDIndex].substring(3);
-  return orderObject;
-}
-function get_date_orderID(order, orderObject) {
-  let date;
-  let day;
-  let month;
-  let year;
-  for (let i = 0; i < order.length; i++) {
-    if (order[i].includes("Order") && order[i + 1].includes("date")) {
-      let orderID = order[i - 1];
-
-      day = order[i + 2];
-      month = order[i + 3];
-      year = order[i + 4];
-
-      orderObject.date = new Date(`${day} ${month} ${year}`);
-
-      // console.log(new Date(`${day} ${month} ${year}`));
-      // console.log(`${day} ${month} ${year}`);
-
-      orderObject.orderID = orderID.substring(1);
-      break;
-    }
-  }
-  return orderObject;
-}
-function splitListIntoOrders(wordsList) {
-  let orderCount = 0;
-  let stringOrdersList = [];
-
-  let foundStart = false;
-  let stringOrder = [];
-  for (let i = 0; i < wordsList.length; i++) {
-    if (!foundStart) {
-      if (
-        wordsList[i].includes("Order") &&
-        wordsList[i + 1].includes("Confirmation") &&
-        wordsList[i + 2].includes("To")
-      ) {
-        foundStart = true;
-        stringOrder.push(wordsList[i]);
-        orderCount++;
-      }
-    } else {
-      stringOrder.push(wordsList[i]);
-      if (wordsList[i].includes("Regards,")) {
-        foundStart = false;
-        stringOrdersList.push(stringOrder);
-        stringOrder = [];
-      }
-    }
-  }
-  return stringOrdersList;
-}
-function splitLinesIntoSeperateWords(lines) {
-  let wordsList = [];
-  for (let line of lines) {
-    let words = line.trim().split(/\s+/);
-    for (let word of words) {
-      if (String(word).length > 0) {
-        wordsList.push(word);
-      }
-    }
-  }
-  return wordsList;
-}
 async function findOrders() {
   var productNames = [];
   var productsMongo = [];
@@ -471,14 +285,6 @@ async function findOrders() {
   console.log("finished reading and saving");
 }
 
-const createProduct = async (product) => {
-  try {
-    const task = await Product.create(product);
-    console.log(`Product ${product.name} saved`);
-  } catch (err) {
-    console.error(err);
-  }
-};
 const createOrder = async (order) => {
   try {
     const task = await Order.create(order);
@@ -487,13 +293,21 @@ const createOrder = async (order) => {
     console.error(err);
   }
 };
-// const createProduct = async (product) => {
-//   try {
-//     const task = await Product.create(product);
-//     console.log(`Product ${product.name} saved`);
-//   } catch (err) {
-//     console.error(err);
-//   }
-// };
+const createProduct = async (product) => {
+  try {
+    const task = await Product.create(product);
+    console.log(`Product ${product.name} saved`);
+  } catch (err) {
+    console.error(err);
+  }
+};
+const getAllProducts = async (product) => {
+  try {
+    const tasks = await Product.find({});
+    console.log(`Product ${product} saved`);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
 exports.output = output;
