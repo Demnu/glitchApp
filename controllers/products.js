@@ -62,9 +62,9 @@ const getUnusedProducts = async (req, res) => {
       String(unusedProduct).includes("espresso") ||
       String(unusedProduct).includes("(Filter)")
     ) {
-      sortedList.unshift(unusedProducts[i]);
-    } else {
       tempList.unshift(unusedProducts[i]);
+    } else {
+      sortedList.unshift(unusedProducts[i]);
     }
   }
   //add leftover products to list
