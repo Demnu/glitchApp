@@ -69,7 +69,7 @@ const getUnusedProducts = async (req, res) => {
   }
   //add leftover products to list
   for (const product of tempList) {
-    sortedList.push(product);
+    sortedList.unshift(product);
   }
   unusedProducts = sortedList;
   res.status(200).send({ unusedProducts });
