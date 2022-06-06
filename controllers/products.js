@@ -49,29 +49,8 @@ const getUnusedProducts = async (req, res) => {
       unusedProducts.push(productsMap[i]);
     }
   }
-  let sortedList = [];
-  let tempList = [];
-  //filter products
-  for (let i = 0; i < unusedProducts.length; i++) {
-    let unusedProduct = unusedProducts[i].label;
-    if (
-      String(unusedProduct).includes("Blend") ||
-      String(unusedProduct).includes("BLEND") ||
-      String(unusedProduct).includes("ESPRESSO") ||
-      String(unusedProduct).includes("Espresso") ||
-      String(unusedProduct).includes("espresso") ||
-      String(unusedProduct).includes("(Filter)")
-    ) {
-      tempList.unshift(unusedProducts[i]);
-    } else {
-      sortedList.unshift(unusedProducts[i]);
-    }
-  }
-  //add leftover products to list
-  for (const product of tempList) {
-    sortedList.unshift(product);
-  }
-  unusedProducts = sortedList;
+  unusedProducts.reverse();
+
   res.status(200).send({ unusedProducts });
 };
 
