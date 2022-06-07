@@ -38,7 +38,7 @@ async function readEmails(lines) {
   let wordsList = splitLinesIntoSeperateWords(lines);
   let ordersWordList = splitListIntoOrders(wordsList);
   let orders = createOrderObjects(ordersWordList);
-
+  console.log(orders);
   for (var i = 0; i < orders.length; i++) {
     var duplicate = false;
     console.log(orders[i].orderID);
@@ -51,6 +51,7 @@ async function readEmails(lines) {
       createOrder(orders[i]);
     }
   }
+
   //delete text file
   fs.truncate("orders.txt", 0, function () {
     console.log("deleting output.txt");
@@ -68,11 +69,14 @@ function createOrderObjects(ordersWordList) {
       products: [],
       customerID: "",
       customerName: "",
+      supplierName: "",
     };
     //get customer name and customer id
     order = get_customerName_customerID(orderArray, order);
     //get date and order id
     order = get_date_orderID(orderArray, order);
+    //get supplier name
+    order = getSupplier(orderArray, order);
     order = getProducts(orderArray, order);
     orders.push(order);
   }
@@ -121,6 +125,36 @@ function getProducts(order, orderObject) {
       createProduct(products[g]);
     }
   }
+  return orderObject;
+}
+function getSupplier(order, orderObject) {
+  let supplierName = "";
+  let asteriskCounter = 0;
+  let hasTwoAsterisks = false;
+  const isWord_From = (element) => element === "From";
+  const indexFrom = order.findIndex(isWord_From);
+  for (let i = indexFrom + 1; i < order.length; i++) {
+    if (hasTwoAsterisks) {
+      break;
+    }
+    supplierName += order[i] + " ";
+    for (var j = 0; j < supplierName.length; j++) {
+      if (supplierName.charAt(j) == "*") {
+        asteriskCounter++;
+        if (asteriskCounter === 2) {
+          hasTwoAsterisks = true;
+        }
+      }
+    }
+    asteriskCounter = 0;
+  }
+  const removeAsterisksandSpace = (supplierName) => {
+    let forbiddenChar = "*";
+    supplierName = supplierName.split(forbiddenChar).join("");
+    return supplierName.slice(0, -1);
+  };
+  console.log(`Supplier name ${orderObject.supplierName}`);
+  orderObject.supplierName = removeAsterisksandSpace(supplierName);
   return orderObject;
 }
 
@@ -487,6 +521,19 @@ const createOrder = async (order) => {
     console.error(err);
   }
 };
+// const updateSupplierName = async (order) => {
+//   try {
+//     let update = await Order.findOneAndUpdate(
+//       { orderID: order.orderID },
+//       { supplierName: order.supplierName },
+//       { new: true }
+//     );
+//     console.log(order);
+//     console.log(update);
+//   } catch (err) {
+//     console.error(err);
+//   }
+// };
 // const createProduct = async (product) => {
 //   try {
 //     const task = await Product.create(product);
