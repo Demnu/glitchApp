@@ -38,7 +38,6 @@ async function readEmails(lines) {
   let wordsList = splitLinesIntoSeperateWords(lines);
   let ordersWordList = splitListIntoOrders(wordsList);
   let orders = createOrderObjects(ordersWordList);
-  console.log(orders);
   for (var i = 0; i < orders.length; i++) {
     var duplicate = false;
     console.log(orders[i].orderID);
@@ -153,7 +152,6 @@ function getSupplier(order, orderObject) {
     supplierName = supplierName.split(forbiddenChar).join("");
     return supplierName.slice(0, -1);
   };
-  console.log(`Supplier name ${orderObject.supplierName}`);
   orderObject.supplierName = removeAsterisksandSpace(supplierName);
   return orderObject;
 }
@@ -205,9 +203,6 @@ function get_date_orderID(order, orderObject) {
 
       orderObject.date = new Date(`${day} ${month} ${year}`);
 
-      // console.log(new Date(`${day} ${month} ${year}`));
-      // console.log(`${day} ${month} ${year}`);
-
       orderObject.orderID = orderID.substring(1);
       break;
     }
@@ -254,7 +249,7 @@ function splitLinesIntoSeperateWords(lines) {
   }
   return wordsList;
 }
-async function findOrders() {
+async function findOrdersOLD() {
   var productNames = [];
   var productsMongo = [];
   var data = [];

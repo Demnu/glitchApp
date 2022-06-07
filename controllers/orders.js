@@ -10,6 +10,7 @@ const getAllOrders = async (req, res) => {
         customerName: order.customerName,
         date: order.date,
         products: order.products,
+        supplierName: order.supplierName,
       });
     });
     res.setHeader("Content-Range", orders.length);
