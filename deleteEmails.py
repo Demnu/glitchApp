@@ -1,5 +1,6 @@
 import imaplib
 import datetime
+import sys
 
 from datetime import date
 from datetime import datetime, timedelta
@@ -39,10 +40,8 @@ yearNumber = d.year
 dateString = dayStr + "-" + month_from_num.__str__() + "-" + yearNumber.__str__()
 
 
-
-
-my_email = "harrycollinsglitchprogram@gmail.com"
-app_generated_password = "Harding1945!"
+my_email = sys.argv[1]
+app_generated_password = sys.argv[2]
 
 a = 'BEFORE \"' + dateString + '\"'
 

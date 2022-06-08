@@ -186,6 +186,9 @@ function get_customerName_customerID(order, orderObject) {
   };
   orderObject.customerName = removeAsterisksandSpace(customerName);
   orderObject.customerID = order[customerIDIndex].substring(3);
+  if (customerName.includes("Pino")) {
+    console.log("found");
+  }
   return orderObject;
 }
 function get_date_orderID(order, orderObject) {

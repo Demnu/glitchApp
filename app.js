@@ -67,17 +67,24 @@ const start = async () => {
   }
 };
 const executeReadEmailScript = () => {
-  const python = spawn(process.env.PYTHON_CMD, ["readEmails.py"]);
+  const python = spawn(process.env.PYTHON_CMD, [
+    "readEmails.py",
+    process.env.GMAIL_ADDRESS,
+    process.env.GMAIL_APP_PASSWORD,
+  ]);
   python.stdout.on("data", function (data) {
     dataToSend = data.toString();
   });
   python.on("close", (code) => {
-    console.log(dataToSend);
     executeDeleteEmailsScript();
   });
 };
 const executeDeleteEmailsScript = () => {
-  const python = spawn(process.env.PYTHON_CMD, ["deleteEmails.py"]);
+  const python = spawn(process.env.PYTHON_CMD, [
+    "deleteEmails.py",
+    process.env.GMAIL_ADDRESS,
+    process.env.GMAIL_APP_PASSWORD,
+  ]);
   python.stdout.on("data", function (data) {
     dataToSend = data.toString();
   });

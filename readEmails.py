@@ -1,18 +1,20 @@
 import email
 import imaplib
-f = open("orders.txt", "a")
+import sys
+
 from email.header import decode_header
+f = open("orders.txt", "a")
 print("Begin Saving Emails")
-EMAIL = 'harrycollinsglitchprogram@gmail.com'
-PASSWORD = 'Harding1945!'
+EMAIL = sys.argv[1]
+PASSWORD = sys.argv[2]
 SERVER = 'imap.gmail.com'
 
 # connect to the server and go to its inbox
 mail = imaplib.IMAP4_SSL(SERVER)
 mail.login(EMAIL, PASSWORD)
+
 # we choose the inbox but you can select others
 mail.select('inbox')
-
 # we'll search using the ALL criteria to retrieve
 # every message inside the inbox
 # it will return with its status and a list of ids
