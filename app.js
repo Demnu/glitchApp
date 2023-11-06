@@ -66,38 +66,38 @@ const start = async () => {
     console.log(error);
   }
 };
-const executeReadEmailScript = () => {
-  const python = spawn(process.env.PYTHON_CMD, [
-    "readEmails.py",
-    process.env.GMAIL_ADDRESS,
-    process.env.GMAIL_APP_PASSWORD,
-  ]);
-  python.stdout.on("data", function (data) {
-    dataToSend = data.toString();
-  });
-  python.on("close", (code) => {
-    executeDeleteEmailsScript();
-  });
-};
-const executeDeleteEmailsScript = () => {
-  const python = spawn(process.env.PYTHON_CMD, [
-    "deleteEmails.py",
-    process.env.GMAIL_ADDRESS,
-    process.env.GMAIL_APP_PASSWORD,
-  ]);
-  python.stdout.on("data", function (data) {
-    dataToSend = data.toString();
-  });
-  python.on("close", (code) => {
-    console.log(dataToSend);
-    counter.output();
-  });
-};
-console.log(__dirname + "/client/app/index.js");
+// const executeReadEmailScript = () => {
+//   const python = spawn(process.env.PYTHON_CMD, [
+//     "readEmails.py",
+//     process.env.GMAIL_ADDRESS,
+//     process.env.GMAIL_APP_PASSWORD,
+//   ]);
+//   python.stdout.on("data", function (data) {
+//     dataToSend = data.toString();
+//   });
+//   python.on("close", (code) => {
+//     executeDeleteEmailsScript();
+//   });
+// };
+// const executeDeleteEmailsScript = () => {
+//   const python = spawn(process.env.PYTHON_CMD, [
+//     "deleteEmails.py",
+//     process.env.GMAIL_ADDRESS,
+//     process.env.GMAIL_APP_PASSWORD,
+//   ]);
+//   python.stdout.on("data", function (data) {
+//     dataToSend = data.toString();
+//   });
+//   python.on("close", (code) => {
+//     console.log(dataToSend);
+//     counter.output();
+//   });
+// };
+// console.log(__dirname + "/client/app/index.js");
 
 start();
-executeReadEmailScript();
-setInterval(async () => {
-  console.log("Executing Script at " + new Date());
-  executeReadEmailScript();
-}, 1000000);
+// executeReadEmailScript();
+// setInterval(async () => {
+//   console.log("Executing Script at " + new Date());
+//   executeReadEmailScript();
+// }, 1000000);
