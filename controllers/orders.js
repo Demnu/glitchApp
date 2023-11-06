@@ -1,21 +1,26 @@
 const Order = require("../models/Order");
 
 const getAllOrders = async (req, res) => {
-  Order.find({}, function (err, orders) {
-    var ordersMap = [];
+  try {
 
-    orders.forEach(function (order) {
-      ordersMap.push({
-        id: order.orderID,
-        customerName: order.customerName,
-        date: order.date,
-        products: order.products,
-        supplierName: order.supplierName,
-      });
-    });
-    res.setHeader("Content-Range", orders.length);
-    res.send(ordersMap);
-  });
+    let orders = await Order.find({})
+    .sort({ date: -1, supplierName: 1, orderID: 1 })
+    .limit(300);
+    // Map the orders to the desired structure
+    let ordersMap = orders.map(order => ({
+      id: order.orderID,
+      customerName: order.customerName,
+      date: order.date,
+      products: order.products,
+      supplierName: order.supplierName
+    }));
+
+    res.setHeader("Content-Range", `orders ${orders.length}`);
+    res.send(ordersMap)
+  } catch (err) {
+    console.error("Error fetching orders:", err);
+    res.status(500).send("Internal Server Error");
+  }
 };
 const getOrder = async (req, res, next) => {
   const { id: id } = req.params;
